@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HeroSection from '../../components/svelte/HeroSection.svelte';
+import AboutSection from '../../components/svelte/AboutSection.svelte';
+import ProjectsSection from '../../components/svelte/ProjectsSection.svelte';
+import ContactForm from '../../components/svelte/ContactForm.svelte';
+import { useTranslations } from '../../i18n/translations';
+
+const lang = 'el';
+const t = useTranslations(lang);
+---
+
+<BaseLayout 
+  title="M.Dev | Full-Stack Web Developer Portfolio"
+  description="Μιχαήλ Παπατάτσης - Full-Stack Web Developer με εξειδίκευση σε React, Astro, Svelte και σύγχρονες web τεχνολογίες. Δείτε το portfolio μου και επικοινωνήστε μαζί μου."
+  lang={lang}
+>
+  <HeroSection 
+    client:load
+    greeting={t.hero.greeting}
+    name={t.hero.name}
+    tagline={t.hero.tagline}
+    description={t.hero.description}
+    ctaPrimary={t.hero.cta}
+    ctaSecondary={t.hero.ctaSecondary}
+  />
+  
+  <AboutSection 
+    client:visible
+    title={t.about.title}
+    lang={lang}
+  />
+  
+  <ProjectsSection 
+    client:visible
+    title={t.projects.title}
+    subtitle={t.projects.subtitle}
+    viewProjectText={t.projects.viewProject}
+    viewCodeText={t.projects.viewCode}
+    lang={lang}
+  />
+  
+  <ContactForm 
+    client:visible
+    title={t.contact.title}
+    subtitle={t.contact.subtitle}
+    namePlaceholder={t.contact.name}
+    emailPlaceholder={t.contact.email}
+    subjectPlaceholder={t.contact.subject}
+    messagePlaceholder={t.contact.message}
+    sendText={t.contact.send}
+    successText={t.contact.success}
+  />
+</BaseLayout>

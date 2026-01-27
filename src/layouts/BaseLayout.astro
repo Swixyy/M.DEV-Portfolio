@@ -1,0 +1,76 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Language } from '../i18n/translations';
+
+interface Props {
+  title: string;
+  description: string;
+  lang?: Language;
+  image?: string;
+}
+
+const { title, description, lang = 'en', image = '/og-image.png' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://mdev-portfolio.com');
+const alternateEn = new URL('/', Astro.site || 'https://mdev-portfolio.com');
+const alternateEl = new URL('/el/', Astro.site || 'https://mdev-portfolio.com');
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content="Michael Papatatsis" />
+    <meta name="keywords" content="web developer, portfolio, full-stack, React, Astro, Svelte, TypeScript" />
+    
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="en" href={alternateEn} />
+    <link rel="alternate" hreflang="el" href={alternateEl} />
+    <link rel="alternate" hreflang="x-default" href={alternateEn} />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site || 'https://mdev-portfolio.com')} />
+    <meta property="og:locale" content={lang === 'el' ? 'el_GR' : 'en_US'} />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image, Astro.site || 'https://mdev-portfolio.com')} />
+    
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
+    <meta name="theme-color" content="rgb(12, 44, 85)" />
+    
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Michael Papatatsis",
+      "alternateName": "M.Dev",
+      "jobTitle": "Full-Stack Web Developer",
+      "url": canonicalURL.toString(),
+      "sameAs": [
+        "https://github.com/Swixyy",
+        "https://www.linkedin.com/in/michael-papatatsis-in/"
+      ],
+      "knowsAbout": ["Web Development", "React", "Astro", "Svelte", "TypeScript", "Node.js"]
+    })} />
+  </head>
+  <body class="bg-cream text-dark min-h-screen flex flex-col">
+    <Header lang={lang} />
+    <main class="flex-grow">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>
