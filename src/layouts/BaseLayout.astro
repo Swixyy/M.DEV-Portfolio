@@ -1,18 +1,67 @@
 ---
-import '../styles/global.css';
+/**
+ * ============================================================================
+ * BaseLayout.astro - Κύριο Layout Template
+ * ============================================================================
+ * 
+ * ΠΕΡΙΓΡΑΦΗ:
+ * Το βασικό layout που χρησιμοποιούν όλες οι σελίδες.
+ * Περιλαμβάνει:
+ * - HTML head με meta tags (SEO)
+ * - Open Graph / Twitter cards
+ * - JSON-LD structured data
+ * - Header component
+ * - Main content slot
+ * - Footer component
+ * 
+ * ΧΡΗΣΗ:
+ * ```astro
+ * <BaseLayout title="Page Title" description="Description" lang="en">
+ *   <YourContent />
+ * </BaseLayout>
+ * ```
+ * 
+ * SEO FEATURES:
+ * - Meta title & description
+ * - Canonical URL
+ * - Language alternates (hreflang)
+ * - Open Graph meta tags
+ * - Twitter card meta tags
+ * - JSON-LD Person schema
+ * ============================================================================
+ */
+
+// Imports
+import '../styles/global.css';  // Global styles (Tailwind + custom)
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import type { Language } from '../i18n/translations';
+import type { Language } from '../i18n/utils';
 
+// Props Interface
 interface Props {
-  title: string;
-  description: string;
-  lang?: Language;
-  image?: string;
+  title: string;          // Page title (tab + SEO)
+  description: string;    // Meta description
+  lang?: Language;        // Page language (default: 'en')
+  image?: string;         // OG image path (optional)
 }
 
-const { title, description, lang = 'en', image = '/og-image.png' } = Astro.props;
+// Destructure props με defaults
+const { 
+  title, 
+  description, 
+  lang = 'en',  // Default language
+  image = '/og-image.png'  // Default OG image
+} = Astro.props;
+
+// ============================================================================
+// SEO URL GENERATION
+// ============================================================================
+
+// Canonical URL: Η "επίσημη" URL της σελίδας για SEO
 const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://mdev-portfolio.com');
+
+// Alternate URLs για language switching
+// Χρησιμοποιούνται στα hreflang tags για SEO
 const alternateEn = new URL('/', Astro.site || 'https://mdev-portfolio.com');
 const alternateEl = new URL('/el/', Astro.site || 'https://mdev-portfolio.com');
 ---
@@ -20,21 +69,38 @@ const alternateEl = new URL('/el/', Astro.site || 'https://mdev-portfolio.com');
 <!DOCTYPE html>
 <html lang={lang}>
   <head>
+    <!-- ================================================================
+         BASIC META TAGS
+         ================================================================ -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     
+    <!-- ================================================================
+         SEO META TAGS
+         ================================================================ -->
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="author" content="Michael Papatatsis" />
     <meta name="keywords" content="web developer, portfolio, full-stack, React, Astro, Svelte, TypeScript" />
     
+    <!-- ================================================================
+         CANONICAL & LANGUAGE ALTERNATES
+         Βοηθούν τις μηχανές αναζήτησης να καταλάβουν:
+         1. Ποια είναι η "κύρια" URL (canonical)
+         2. Ποιες γλώσσες υπάρχουν (hreflang)
+         ================================================================ -->
     <link rel="canonical" href={canonicalURL} />
     <link rel="alternate" hreflang="en" href={alternateEn} />
     <link rel="alternate" hreflang="el" href={alternateEl} />
     <link rel="alternate" hreflang="x-default" href={alternateEn} />
     
+    <!-- ================================================================
+         OPEN GRAPH META TAGS
+         Χρησιμοποιούνται όταν κάποιος μοιράζεται τη σελίδα
+         σε social media (Facebook, LinkedIn, κλπ)
+         ================================================================ -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
@@ -42,16 +108,29 @@ const alternateEl = new URL('/el/', Astro.site || 'https://mdev-portfolio.com');
     <meta property="og:image" content={new URL(image, Astro.site || 'https://mdev-portfolio.com')} />
     <meta property="og:locale" content={lang === 'el' ? 'el_GR' : 'en_US'} />
     
+    <!-- ================================================================
+         TWITTER CARD META TAGS
+         Για Twitter/X shares
+         ================================================================ -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content={canonicalURL} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={new URL(image, Astro.site || 'https://mdev-portfolio.com')} />
     
+    <!-- ================================================================
+         FAVICON & THEME
+         ================================================================ -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
+    <!-- Theme color για mobile browser chrome -->
     <meta name="theme-color" content="rgb(12, 44, 85)" />
     
+    <!-- ================================================================
+         JSON-LD STRUCTURED DATA
+         Schema.org markup για rich snippets στα search results
+         Περιγράφει τον developer ως "Person" entity
+         ================================================================ -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Person",
@@ -66,11 +145,24 @@ const alternateEl = new URL('/el/', Astro.site || 'https://mdev-portfolio.com');
       "knowsAbout": ["Web Development", "React", "Astro", "Svelte", "TypeScript", "Node.js"]
     })} />
   </head>
+  
+  <!-- ================================================================
+       BODY
+       - bg-cream: Custom background color από Tailwind config
+       - min-h-screen: Τουλάχιστον full viewport height
+       - flex flex-col: Για sticky footer pattern
+       ================================================================ -->
   <body class="bg-cream text-dark min-h-screen flex flex-col">
-    <Header lang={lang} />
+    <!-- Header: Navigation bar -->
+    <Header />
+    
+    <!-- Main Content: flex-grow για να γεμίσει το available space -->
     <main class="flex-grow">
+      <!-- Slot: Εδώ μπαίνει το content από τα pages -->
       <slot />
     </main>
-    <Footer lang={lang} />
+    
+    <!-- Footer -->
+    <Footer />
   </body>
 </html>

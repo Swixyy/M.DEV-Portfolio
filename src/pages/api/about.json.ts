@@ -1,7 +1,47 @@
+/**
+ * ============================================================================
+ * /api/about.json - API Endpoint για About Section Data
+ * ============================================================================
+ * 
+ * ΠΕΡΙΓΡΑΦΗ:
+ * Astro API endpoint που επιστρέφει τα δεδομένα του About section.
+ * Χρησιμοποιείται για τις "εξτρα βαθμούς" απαιτήσεις της εργασίας.
+ * 
+ * ΧΡΗΣΗ:
+ * GET /api/about.json?lang=en  → Επιστρέφει Αγγλικά
+ * GET /api/about.json?lang=el  → Επιστρέφει Ελληνικά
+ * GET /api/about.json          → Default: Αγγλικά
+ * 
+ * RESPONSE FORMAT:
+ * {
+ *   "bio": "...",
+ *   "fiveYearGoal": "...",
+ *   "interviewHighlight": "..."
+ * }
+ * 
+ * ΣΗΜΕΙΩΣΗ:
+ * - prerender = false: Απαιτείται για server-side rendering
+ * - Στο development λειτουργεί κανονικά
+ * - Για production χρειάζεται server adapter (Node.js, Vercel, κλπ)
+ * ============================================================================
+ */
+
 import type { APIRoute } from 'astro';
 import type { AboutData } from '../../types';
 
+
+// ============================================================================
+// ABOUT CONTENT DATA
+// ============================================================================
+
+/**
+ * Το περιεχόμενο του About section σε δύο γλώσσες
+ * Κάθε γλώσσα έχει τα ίδια πεδία (bio, fiveYearGoal, interviewHighlight)
+ */
 const aboutContent: Record<'en' | 'el', AboutData> = {
+  // -------------------------------------------------------------------------
+  // ENGLISH CONTENT
+  // -------------------------------------------------------------------------
   en: {
     bio: `I'm Michael, a passionate Full-Stack Web Developer with a strong foundation in modern web technologies. 
     I specialize in building responsive, user-friendly applications using React, Next.js, Astro, and Svelte on the frontend, 
@@ -23,6 +63,10 @@ const aboutContent: Record<'en' | 'el', AboutData> = {
     It was inspiring to discuss how thoughtful architecture decisions can lead to better maintainability 
     and scalability in the long run.`
   },
+  
+  // -------------------------------------------------------------------------
+  // GREEK CONTENT
+  // -------------------------------------------------------------------------
   el: {
     bio: `Είμαι ο Μιχαήλ. Με πάθος και αστείρευτη περιέργεια εξερευνώ τις σύγχρονες web τεχνολογίες ως Full-Stack Web Developer. 
     Εξειδικεύομαι στη δημιουργία responsive, φιλικών προς τον χρήστη εφαρμογών χρησιμοποιώντας React, Next.js, Astro 
@@ -45,18 +89,51 @@ const aboutContent: Record<'en' | 'el', AboutData> = {
   }
 };
 
+
+// ============================================================================
+// API ROUTE HANDLER
+// ============================================================================
+
+/**
+ * GET Handler
+ * Επιστρέφει τα about data με βάση το lang query parameter
+ * 
+ * @param request - Astro request object
+ * @returns JSON response με τα about data
+ */
 export const GET: APIRoute = ({ request }) => {
+  // Parse URL για να πάρουμε query parameters
   const url = new URL(request.url);
+  
+  // Πάρε το lang parameter, default 'en'
   const lang = url.searchParams.get('lang') as 'en' | 'el' || 'en';
+  
+  // Validate: αν δεν είναι 'el', χρησιμοποίησε 'en'
   const validLang = lang === 'el' ? 'el' : 'en';
   
+  // Επέστρεψε JSON response
   return new Response(JSON.stringify(aboutContent[validLang]), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
+      // Cache για 1 ώρα (τα data δεν αλλάζουν συχνά)
       'Cache-Control': 'public, max-age=3600'
     }
   });
 };
 
+
+// ============================================================================
+// BUILD CONFIGURATION
+// ============================================================================
+
+/**
+ * prerender = false
+ * 
+ * ΣΗΜΕΙΩΣΗ: Αυτό είναι απαραίτητο για server-side endpoints.
+ * - Στο dev mode δουλεύει κανονικά
+ * - Για production build χρειάζεται adapter (π.χ. @astrojs/node)
+ * - Χωρίς adapter, το build θα αποτύχει
+ */
 export const prerender = false;
+

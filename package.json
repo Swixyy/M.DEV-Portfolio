@@ -11,6 +11,7 @@
   "dependencies": {
     "@astrojs/svelte": "^7.2.5",
     "@astrojs/tailwind": "^6.0.2",
+    "@astrojs/vercel": "^9.0.0",
     "astro": "^5.16.15",
     "svelte": "^5.48.3",
     "svelte-inview": "^4.0.4",

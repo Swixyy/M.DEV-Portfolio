@@ -1,23 +1,66 @@
+<!--
+  ============================================================================
+  ProjectsSection.svelte - Ενότητα Projects/Portfolio
+  ============================================================================
+  
+  ΠΕΡΙΓΡΑΦΗ:
+  Εμφανίζει τα projects σε grid layout με interactive cards.
+  Κάθε card ανοίγει modal με περισσότερες λεπτομέρειες.
+  
+  FEATURES:
+  - Responsive grid: 1 column (mobile) → 2 columns (tablet) → 3 columns (desktop)
+  - Interactive cards με hover effects
+  - Modal popup για λεπτομέρειες project
+  - Featured badge για highlighted projects
+  - Tags για τεχνολογίες
+  - Links για Live Demo και GitHub
+  
+  PROPS:
+  - title: Τίτλος section
+  - subtitle: Υπότιτλος
+  - viewProjectText: Text για Live Demo button
+  - viewCodeText: Text για GitHub button
+  - lang: Γλώσσα ('en' | 'el')
+  ============================================================================
+-->
+
 <script lang="ts">
   import { inview } from 'svelte-inview';
   import type { Project } from '../../types';
   
-  export let title: string;
-  export let subtitle: string;
-  export let viewProjectText: string;
-  export let viewCodeText: string;
-  export let lang: 'en' | 'el';
+  // Props - Τα κείμενα για i18n support
+  export let title: string;           // "My Projects" / "Τα Έργα μου"
+  export let subtitle: string;        // Υπότιτλος
+  export let viewProjectText: string; // "View Project" / "Προβολή Έργου"
+  export let viewCodeText: string;    // "View Code" / "Προβολή Κώδικα"
+  export let lang: 'en' | 'el';       // Γλώσσα για dynamic content
   
-  let isVisible = false;
-  let selectedProject: Project | null = null;
-  let isModalOpen = false;
+  // State
+  let isVisible = false;                        // Animation trigger
+  let selectedProject: Project | null = null;   // Project για το modal
+  let isModalOpen = false;                      // Modal visibility
   
+  /**
+   * Handler για inview event
+   */
   const handleInview = (event: CustomEvent<{ inView: boolean }>) => {
     if (event.detail.inView) {
       isVisible = true;
     }
   };
   
+  /**
+   * PROJECTS DATA
+   * Κάθε project έχει:
+   * - id: Unique identifier
+   * - title: Object με en/el versions
+   * - description: Object με en/el versions
+   * - image: Path στο public folder
+   * - tags: Array με τεχνολογίες
+   * - liveUrl: (optional) Link για live demo
+   * - githubUrl: (optional) Link για GitHub repo
+   * - featured: Boolean για featured badge
+   */
   const projects: Project[] = [
     {
       id: 'ecommerce-ads',
@@ -67,18 +110,29 @@
     }
   ];
   
+  /**
+   * Ανοίγει το modal με τις λεπτομέρειες του project
+   */
   function openModal(project: Project) {
     selectedProject = project;
     isModalOpen = true;
+    // Απενεργοποιεί το scroll του body για να μην scrollάρει πίσω από το modal
     document.body.style.overflow = 'hidden';
   }
   
+  /**
+   * Κλείνει το modal
+   */
   function closeModal() {
     isModalOpen = false;
     selectedProject = null;
+    // Επαναφέρει το scroll
     document.body.style.overflow = '';
   }
   
+  /**
+   * Keyboard handler - Κλείνει το modal με Escape
+   */
   function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape' && isModalOpen) {
       closeModal();
@@ -86,8 +140,10 @@
   }
 </script>
 
+<!-- Global keyboard listener για Escape key -->
 <svelte:window on:keydown={handleKeydown} />
 
+<!-- MAIN SECTION -->
 <section 
   id="projects"
   class="py-20 md:py-32 bg-cream"
@@ -95,6 +151,7 @@
   on:inview_change={handleInview}
 >
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- HEADER -->
     <div 
       class="text-center mb-16 opacity-0"
       class:animate-fade-in-up={isVisible}
@@ -103,8 +160,18 @@
       <p class="section-subtitle mx-auto">{subtitle}</p>
     </div>
     
+    <!-- 
+      PROJECTS GRID
+      Responsive: 1 col → 2 cols (md) → 3 cols (lg)
+    -->
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
       {#each projects as project, index}
+        <!--
+          PROJECT CARD
+          - Κάνει click για να ανοίξει modal
+          - Hover effects: shadow + lift up
+          - Staggered animation delay βάσει index
+        -->
         <div 
           class="group bg-white rounded-2xl overflow-hidden shadow-lg border border-primary-light/20 
                  hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer opacity-0"
@@ -115,7 +182,9 @@
           role="button"
           tabindex="0"
         >
+          <!-- IMAGE SECTION -->
           <div class="relative h-48 bg-gradient-to-br from-primary to-primary-light overflow-hidden">
+            <!-- Project Image - Κρύβεται αν δεν φορτώσει -->
             <img 
               src={project.image} 
               alt={project.title[lang]}
@@ -123,14 +192,17 @@
               loading="lazy"
               on:error={(e) => (e.currentTarget as HTMLImageElement).style.display = 'none'}
             />
+            <!-- Fallback: Αρχικό γράμμα του project id -->
             <div class="absolute inset-0 flex items-center justify-center">
               <span class="text-6xl font-bold text-white/20">{project.id.charAt(0).toUpperCase()}</span>
             </div>
+            <!-- Hover Overlay -->
             <div class="absolute inset-0 bg-primary-dark/0 group-hover:bg-primary-dark/40 transition-all duration-300 flex items-center justify-center">
               <span class="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                 {lang === 'en' ? 'View Details' : 'Λεπτομέρειες'}
               </span>
             </div>
+            <!-- Featured Badge -->
             {#if project.featured}
               <div class="absolute top-4 right-4 bg-primary-light text-white text-xs font-semibold px-3 py-1 rounded-full">
                 Featured
@@ -138,14 +210,17 @@
             {/if}
           </div>
           
+          <!-- CONTENT SECTION -->
           <div class="p-6">
             <h3 class="text-xl font-semibold text-primary-dark mb-2 group-hover:text-primary transition-colors">
               {project.title[lang]}
             </h3>
+            <!-- Description - Line clamp σε 2 γραμμές -->
             <p class="text-primary-dark/60 text-sm mb-4 line-clamp-2">
               {project.description[lang]}
             </p>
             
+            <!-- Tags - Δείχνει μέχρι 3, +N για τα υπόλοιπα -->
             <div class="flex flex-wrap gap-2">
               {#each project.tags.slice(0, 3) as tag}
                 <span class="text-xs font-medium bg-primary/10 text-primary px-2 py-1 rounded-full">
@@ -165,7 +240,15 @@
   </div>
 </section>
 
+<!--
+  MODAL
+  Εμφανίζεται όταν ο χρήστης κάνει click σε ένα project card
+-->
 {#if isModalOpen && selectedProject}
+  <!-- 
+    BACKDROP
+    Click στο backdrop κλείνει το modal
+  -->
   <div 
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary-dark/80 backdrop-blur-sm"
     on:click={closeModal}
@@ -173,6 +256,10 @@
     role="button"
     tabindex="-1"
   >
+    <!--
+      MODAL CONTENT
+      stopPropagation για να μην κλείνει όταν κάνεις click μέσα στο modal
+    -->
     <div 
       class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-fade-in-up"
       on:click|stopPropagation
@@ -181,6 +268,7 @@
       aria-modal="true"
       tabindex="-1"
     >
+      <!-- MODAL HEADER: Image -->
       <div class="relative h-64 bg-gradient-to-br from-primary to-primary-light">
         <img 
           src={selectedProject.image} 
@@ -189,9 +277,11 @@
           loading="lazy"
           on:error={(e) => (e.currentTarget as HTMLImageElement).style.display = 'none'}
         />
+        <!-- Fallback letter -->
         <div class="absolute inset-0 flex items-center justify-center">
           <span class="text-8xl font-bold text-white/20">{selectedProject.id.charAt(0).toUpperCase()}</span>
         </div>
+        <!-- Close Button -->
         <button 
           class="absolute top-4 right-4 w-10 h-10 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center transition-colors"
           on:click={closeModal}
@@ -203,14 +293,18 @@
         </button>
       </div>
       
+      <!-- MODAL BODY -->
       <div class="p-8">
+        <!-- Title -->
         <h3 class="text-2xl font-bold text-primary-dark mb-4">
           {selectedProject.title[lang]}
         </h3>
+        <!-- Full Description -->
         <p class="text-primary-dark/70 mb-6 leading-relaxed">
           {selectedProject.description[lang]}
         </p>
         
+        <!-- All Tags -->
         <div class="flex flex-wrap gap-2 mb-8">
           {#each selectedProject.tags as tag}
             <span class="text-sm font-medium bg-primary/10 text-primary px-3 py-1.5 rounded-full">
@@ -219,7 +313,9 @@
           {/each}
         </div>
         
+        <!-- Action Buttons -->
         <div class="flex flex-wrap gap-4">
+          <!-- Live Demo Button (αν υπάρχει) -->
           {#if selectedProject.liveUrl}
             <a 
               href={selectedProject.liveUrl}
@@ -233,6 +329,7 @@
               {viewProjectText}
             </a>
           {/if}
+          <!-- GitHub Button (αν υπάρχει) -->
           {#if selectedProject.githubUrl}
             <a 
               href={selectedProject.githubUrl}
@@ -252,7 +349,13 @@
   </div>
 {/if}
 
+<!--
+  ============================================================================
+  STYLES
+  ============================================================================
+-->
 <style>
+  /* Fade-in animation για cards και modal */
   .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
   }
@@ -262,6 +365,10 @@
     to { opacity: 1; transform: translateY(0); }
   }
   
+  /* 
+    Line Clamp: Περιορίζει το κείμενο σε 2 γραμμές
+    με ellipsis (...) στο τέλος
+  */
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;

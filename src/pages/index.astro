@@ -4,51 +4,51 @@ import HeroSection from '../components/svelte/HeroSection.svelte';
 import AboutSection from '../components/svelte/AboutSection.svelte';
 import ProjectsSection from '../components/svelte/ProjectsSection.svelte';
 import ContactForm from '../components/svelte/ContactForm.svelte';
-import { useTranslations } from '../i18n/translations';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
 
-const lang = 'en';
+const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<BaseLayout 
+<BaseLayout
   title="M.Dev | Full-Stack Web Developer Portfolio"
   description="Michael Papatatsis - Full-Stack Web Developer specializing in React, Astro, Svelte, and modern web technologies. View my portfolio and get in touch."
   lang={lang}
 >
-  <HeroSection 
+  <HeroSection
     client:load
-    greeting={t.hero.greeting}
-    name={t.hero.name}
-    tagline={t.hero.tagline}
-    description={t.hero.description}
-    ctaPrimary={t.hero.cta}
-    ctaSecondary={t.hero.ctaSecondary}
+    greeting={t('hero.greeting')}
+    name={t('hero.name')}
+    tagline={t('hero.tagline')}
+    description={t('hero.description')}
+    ctaPrimary={t('hero.cta')}
+    ctaSecondary={t('hero.ctaSecondary')}
   />
-  
-  <AboutSection 
+
+  <AboutSection
     client:visible
-    title={t.about.title}
+    title={t('about.title')}
     lang={lang}
   />
-  
-  <ProjectsSection 
+
+  <ProjectsSection
     client:visible
-    title={t.projects.title}
-    subtitle={t.projects.subtitle}
-    viewProjectText={t.projects.viewProject}
-    viewCodeText={t.projects.viewCode}
+    title={t('projects.title')}
+    subtitle={t('projects.subtitle')}
+    viewProjectText={t('projects.viewProject')}
+    viewCodeText={t('projects.viewCode')}
     lang={lang}
   />
-  
-  <ContactForm 
+
+  <ContactForm
     client:visible
-    title={t.contact.title}
-    subtitle={t.contact.subtitle}
-    namePlaceholder={t.contact.name}
-    emailPlaceholder={t.contact.email}
-    subjectPlaceholder={t.contact.subject}
-    messagePlaceholder={t.contact.message}
-    sendText={t.contact.send}
-    successText={t.contact.success}
+    title={t('contact.title')}
+    subtitle={t('contact.subtitle')}
+    namePlaceholder={t('contact.name')}
+    emailPlaceholder={t('contact.email')}
+    subjectPlaceholder={t('contact.subject')}
+    messagePlaceholder={t('contact.message')}
+    sendText={t('contact.send')}
+    successText={t('contact.success')}
   />
 </BaseLayout>
