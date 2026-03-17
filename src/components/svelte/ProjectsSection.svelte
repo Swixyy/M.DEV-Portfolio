@@ -74,7 +74,7 @@
       },
       image: '/images/projects/ecommerce-ads.png',
       tags: ['Next.js', 'TypeScript', 'Prisma', 'TailwindCSS', 'PostgreSQL'],
-      liveUrl: '#',
+      liveUrl: 'https://ecommerce-with-ads-git-vercel-9b19df-michails-projects-54d1489f.vercel.app',
       githubUrl: 'https://github.com/Swixyy/EcommerceWithAds',
       featured: true
     },
