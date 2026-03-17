@@ -249,7 +249,7 @@
             </div>
             <div>
               <h3 class="text-xl font-semibold text-primary-dark mb-3">
-                {lang === 'en' ? 'What I Enjoyed from the Interview' : 'Τι μου Άρεσε από τη Συνέντευξη'}
+                {lang === 'en' ? 'How I Choose My Tech Stack' : 'Πώς Επιλέγω το Tech Stack μου'}
               </h3>
               <p 
                 class="text-primary-dark/70 leading-relaxed drop-bounce"
